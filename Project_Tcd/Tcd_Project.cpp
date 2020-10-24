@@ -258,9 +258,26 @@ int main(void)
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 0.f, 1.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
 
+	
+
+	// FOV - Read about it in orthographic projection
+	// Create up vector for the world (x , y(up) , Z )
+	glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 Worldup = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 camfront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::mat4 ViewMatrix = glm::mat4(1.0f);
+	ViewMatrix = glm::lookAt(CameraPosition, CameraPosition + camfront, Worldup);
+
+	float fov = 90.0f;
+	float nearPlane = 0.5f;
+	float farPlane = 1000.0f;
+	glm::mat4 ProjectionMatrix = glm::mat4(1.0f);
+
+	ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float> (width) / Height, nearPlane, farPlane);
+
 	ourShader.setMat4fv(ModelMatrix, "ModelMatrix");
-
-
+	ourShader.setMat4fv(ViewMatrix, "ViewMatrix");
+	ourShader.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
 	//main loop and drawing 
 
@@ -278,12 +295,14 @@ int main(void)
 
 		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f));
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.0f, 0.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(5.f), glm::vec3(0.0f, 1.f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 1.f, 0.0f));
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 0.f, 1.0f));
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.01f));
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
 
 		ourShader.setMat4fv(ModelMatrix, "ModelMatrix");
 
+		ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float> (width) / Height, nearPlane, farPlane);
+		ourShader.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 		ourShader.use();
 		
 		// to use both texture we need to multiply both 
