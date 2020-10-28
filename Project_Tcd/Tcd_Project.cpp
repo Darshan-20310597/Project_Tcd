@@ -3,17 +3,17 @@
 
 using namespace std;
 
-const unsigned int width= 600;
-const unsigned int Height = 800;
+const unsigned int width= 800;
+const unsigned int Height = 600;
 
 // vertex in the program 
 Vertex vertices[] =
 {
-	// postions                      // colors                       //texture
-	glm::vec3(-0.5f,0.5f,0.0f),       glm::vec3(1.0f,0.0f,0.0f),     glm::vec2(0.0f,1.0f),
-	glm::vec3(-0.5f,-0.5f,0.0f),     glm::vec3(0.0f,1.0f,0.0f),     glm::vec2(0.0f,0.0f),
-	glm::vec3(0.5f,-0.5f,0.0f),      glm::vec3(0.0f,0.0f,1.0f),     glm::vec2(1.0f,0.0f),
-	glm::vec3(0.5f,0.5f,0.0f),      glm::vec3(1.0f,1.0f,1.0f),     glm::vec2(1.0f,1.0f)
+	// postions                      // colors                       //texture					 //Normals
+	glm::vec3(-0.5f,0.5f,0.0f),      glm::vec3(1.0f,0.0f,0.0f),     glm::vec2(0.0f,1.0f),        glm::vec3(0.0f,0.0f,-1.0f),
+	glm::vec3(-0.5f,-0.5f,0.0f),     glm::vec3(0.0f,1.0f,0.0f),     glm::vec2(0.0f,0.0f),		 glm::vec3(0.0f,0.0f,-1.0f),
+	glm::vec3(0.5f,-0.5f,0.0f),      glm::vec3(0.0f,0.0f,1.0f),     glm::vec2(1.0f,0.0f),		 glm::vec3(0.0f,0.0f,-1.0f),
+	glm::vec3(0.5f,0.5f,0.0f),       glm::vec3(1.0f,1.0f,1.0f),     glm::vec2(1.0f,1.0f),		 glm::vec3(0.0f,0.0f,-1.0f)
 };
 
 unsigned noofvertices = sizeof(vertices) / sizeof(Vertex);
@@ -29,11 +29,22 @@ unsigned int indeces[] =
 unsigned noofindeces = sizeof(indeces) / sizeof(GLint);
 
 
-
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void UpdateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3 scale);
 void processInput(GLFWwindow* window);
 char infoLog[512];
 static unsigned char wireframe;
+
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+float fov = 45.0f;
+glm::vec3 camfront = glm::vec3(0.0f, 0.0f, -1.0f);
+
 
 //static std::string ParseShader(const std::string& file)
 //{
@@ -117,10 +128,10 @@ int main(void)
 
 	// Important with Presepctive matrix
 	
-	//int frameBufferWidth, frameBufferHeight = 0;
+	int frameBufferWidth, frameBufferHeight = 0;
 	//Create window 
-	GLFWwindow* window = glfwCreateWindow(Height,width,"Window Only",NULL,NULL);
-	//glfwGetFramebufferSize(window, &frameBufferWidth,&frameBufferHeight);
+	GLFWwindow* window = glfwCreateWindow(width,Height,"Window Only",NULL,NULL);
+	glfwGetFramebufferSize(window, &frameBufferWidth,&frameBufferHeight);
 	if (!window) {
 
 		std::cout << " Failed to open Window" << std::endl;
@@ -153,7 +164,7 @@ int main(void)
 	std::cout << fragmentsource << std::endl;*/
 
 	/*unsigned int program = createShader(vertexsource, fragmentsource);*/
-
+	/***** ADDING NORMAL */
 	//Shader core_program("vertex.glsl", "fragment.glsl","geometry.glsl");
 	unsigned int VBO, VAO , EBO;
 	glGenVertexArrays(1, &VAO);// VAO Big box that holders all the data
@@ -175,6 +186,9 @@ int main(void)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, textcoord));
 	glEnableVertexAttribArray(2);
+	// adding normal
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	glEnableVertexAttribArray(3);
 	
 	//glEnableVertexAttribArray(1);
 	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -185,82 +199,121 @@ int main(void)
 	glBindVertexArray(0);
 
 	// Texture Iinitialization
-	int image_width = 0;
-	int image_height = 0;
-	unsigned char* image = SOIL_load_image("Images/Tomato.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+	//int image_width = 0;
+	//int image_height = 0;
+	//unsigned char* image = SOIL_load_image("Images/Tcd.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
 
-	// We create a texture id to load the images 
-	unsigned int Texture0;
-	//generate textures and bind it
-	glGenTextures(1, &Texture0);
-	glBindTexture(GL_TEXTURE_2D, Texture0);
+	//// We create a texture id to load the images 
+	//unsigned int Texture0;
+	////generate textures and bind it
+	//glGenTextures(1, &Texture0);
+	//glBindTexture(GL_TEXTURE_2D, Texture0);
 
-	//glTexParamteri() -- maping images to x and y coordinates in Textures (S and T)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	////glTexParamteri() -- maping images to x and y coordinates in Textures (S and T)
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	if (image)
-	{
-		std::cout << "Image Loaded successfully" << std::endl;
-		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, image_width, image_height,0, GL_RGBA,GL_UNSIGNED_BYTE,image);
-		//glGenerateMipmap - makes smaller and bigger version of image we have given (Several sizes and 
-		glGenerateMipmap(GL_TEXTURE_2D);
-    
-	}
-	else {
-		std::cout << "Error While Loading Image : Texture loading failed" << std::endl;
-	}
+	//if (image)
+	//{
+	//	std::cout << "Image Loaded successfully" << std::endl;
+	//	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, image_width, image_height,0, GL_RGBA,GL_UNSIGNED_BYTE,image);
+	//	//glGenerateMipmap - makes smaller and bigger version of image we have given (Several sizes and 
+	//	glGenerateMipmap(GL_TEXTURE_2D);
+ //   
+	//}
+	//else {
+	//	std::cout << "Error While Loading Image : Texture loading failed" << std::endl;
+	//}
 
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
+	//glActiveTexture(0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	//SOIL_free_image_data(image);
 
+	Texture texture_0("Images/Tcd.png", GL_TEXTURE_2D,0);
+	Texture texture_1("Images/Tomato.png", GL_TEXTURE_2D,1);
 	//Texture 2 
-	// Texture Iinitialization
-	int image_width1 = 0;
-	int image_height1 = 0;
-	unsigned char* image1 = SOIL_load_image("Images/Tcd.png", &image_width1, &image_height1, NULL, SOIL_LOAD_RGBA);
+	//// Texture Iinitialization
+	//int image_width1 = 0;
+	//int image_height1 = 0;
+	//unsigned char* image1 = SOIL_load_image("Images/Tcd.png", &image_width1, &image_height1, NULL, SOIL_LOAD_RGBA);
 
-	// We create a texture id to load the images 
-	unsigned int Texture1;
-	//generate textures and bind it
-	glGenTextures(1, &Texture1);
-	glBindTexture(GL_TEXTURE_2D, Texture1);
+	//// We create a texture id to load the images 
+	//unsigned int Texture1;
+	////generate textures and bind it
+	//glGenTextures(1, &Texture1);
+	//glBindTexture(GL_TEXTURE_2D, Texture1);
 
-	//glTexParamteri() -- maping images to x and y coordinates in Textures (S and T)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	////glTexParamteri() -- maping images to x and y coordinates in Textures (S and T)
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	if (image1)
-	{
-		std::cout << "Image Loaded successfully" << std::endl;
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width1, image_height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
-		//glGenerateMipmap - makes smaller and bigger version of image we have given (Several sizes and 
-		glGenerateMipmap(GL_TEXTURE_2D);
+	//if (image1)
+	//{
+	//	std::cout << "Image Loaded successfully" << std::endl;
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width1, image_height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
+	//	//glGenerateMipmap - makes smaller and bigger version of image we have given (Several sizes and 
+	//	glGenerateMipmap(GL_TEXTURE_2D);
 
-	}
-	else {
-		std::cout << "Error While Loading Image : Texture loading failed" << std::endl;
-	}
+	//}
+	//else {
+	//	std::cout << "Error While Loading Image : Texture loading failed" << std::endl;
+	//}
 
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image1);
+	//glActiveTexture(0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	//SOIL_free_image_data(image1);
+
+
 	//Creates an identity matrix 4X4
+
+	// We must store everything in variables and not in matrix for scaling rotating and position
+
+	glm::vec3 position(0.0f);
+	glm::vec3 rotation(0.0f);
+	glm::vec3 scale(1.0f);
+
 	glm::mat4 ModelMatrix(1.0f);
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 1.f, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 0.f, 1.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f));
+	ModelMatrix = glm::translate(ModelMatrix, position);
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.f, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.f, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, scale);
+
+
+	
+
+	// FOV - Read about it in orthographic projection
+	// Create up vector for the world (x , y(up) , Z )
+	glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 Worldup = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 camfront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraRight = glm::normalize(glm::cross(Worldup, camfront));
+	glm::vec3 cameraUp = glm::cross(camfront, cameraRight);
+	glm::mat4 ViewMatrix = glm::mat4(1.0f);
+	ViewMatrix = glm::lookAt(CameraPosition, CameraPosition + camfront, Worldup);
+
+	float fov = 95.0f;
+	float nearPlane = 0.5f;
+	float farPlane = 1000.0f;
+	glm::mat4 ProjectionMatrix = glm::mat4(1.0f);
+
+	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+	ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float> (frameBufferWidth) / frameBufferHeight, nearPlane, farPlane);
+
+	//glm::frustum();
+	//Lights
+	glm::vec3 lightpos0 = glm::vec3(0.0f, 0.0f, 1.0f);
+
 
 	ourShader.setMat4fv(ModelMatrix, "ModelMatrix");
-
-
+	ourShader.setMat4fv(ViewMatrix, "ViewMatrix");
+	ourShader.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
+	ourShader.setVec3f(lightpos0, "lightpos0");
+	ourShader.setVec3f(CameraPosition, "CameraPosition");
 
 	//main loop and drawing 
 
@@ -268,34 +321,59 @@ int main(void)
 	{
 		glfwPollEvents();
 		processInput(window);
-		glClearColor(0.2f, 0.2f, 0.2f, 0.2f); //rgb a-opaque
+		UpdateInput(window, position, rotation, scale);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.f); //rgb a-opaque
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		
 		
 		ourShader.set1i(0, "texture0");
 		ourShader.set1i(1, "texture1");
-		//ourShader.use();
 
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.0f, 0.0f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(5.f), glm::vec3(0.0f, 1.f, 0.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 0.f, 1.0f));
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.01f));
+		//ourShader.use();
+		// Initialize model matrix here also 
+		//position.z -= 0.01f;
+		//rotation.y += 1.0f;
+		//ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f,0.0f,-1.0f));
+		//ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//ModelMatrix = glm::rotate(ModelMatrix, glm::radians(5.f), glm::vec3(0.0f, 1.f, 0.0f));
+		//ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 0.f, 1.0f));
+		//ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f)); //- old code
+
+
+
+		// chnaging cat movements 
+		// DOnt forget to add + and - sign else we will get a still image only 
+		position.z -= 0.01f;
+		rotation.x += 1.0f;
+		/*glm::mat4 trans = glm::mat4(1.0f);
+		glm::mat4 rotate = glm::mat4(0.0f);
+		glm::mat4 scaleM = glm::mat4(0.0f);*/
+		glm::mat4 ModelMatrix(1.0f);
+		ModelMatrix = glm::translate(ModelMatrix, position);
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.f, 0.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.f, 1.0f));
+		ModelMatrix = glm::scale(ModelMatrix, scale);
+		
+		
 
 		ourShader.setMat4fv(ModelMatrix, "ModelMatrix");
-
+		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float> (frameBufferWidth) / frameBufferHeight, nearPlane, farPlane);
+		ourShader.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 		ourShader.use();
 		
 		// to use both texture we need to multiply both 
 
-// Activate Texture and bind it after this use it in the fragment shader
+		// Activate Texture and bind it after this use it in the fragment shader
 		
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture0);
+		/*glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture0);*/
 		// Activate Texture and bind it after this use it in the fragment shader to activate both textures
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, Texture1);
-
+		/*glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Texture1);*/
+		texture_0.bind();
+		texture_1.bind();
 
 		
 		// Before Binding this i need to get my texture 
@@ -337,9 +415,74 @@ void processInput(GLFWwindow* window)
 		glPolygonMode(GL_FRONT_AND_BACK, (wireframe = 1 - wireframe) ? GL_LINE : GL_FILL);
 }
 
+void UpdateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3 scale)
+{
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		position.z += 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		position.z -= 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		position.x += 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		position.x -= 0.01f;
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		rotation.y += 5.01f;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		rotation.y -= 5.01f;
+}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+}
+
+
+//mouse
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.1f; // change this value to your liking
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	camfront = glm::normalize(front);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	fov -= (float)yoffset;
+	if (fov < 1.0f)
+		fov = 1.0f;
+	if (fov > 45.0f)
+		fov = 45.0f;
 }
