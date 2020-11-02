@@ -10,10 +10,10 @@ const unsigned int Height = 600;
 Vertex vertices[] =
 {
 	// postions                      // colors                       //texture					 //Normals
-	glm::vec3(-0.5f,0.5f,0.0f),      glm::vec3(1.0f,0.0f,0.0f),     glm::vec2(0.0f,1.0f),        glm::vec3(0.0f,0.0f,-1.0f),
-	glm::vec3(-0.5f,-0.5f,0.0f),     glm::vec3(0.0f,1.0f,0.0f),     glm::vec2(0.0f,0.0f),		 glm::vec3(0.0f,0.0f,-1.0f),
-	glm::vec3(0.5f,-0.5f,0.0f),      glm::vec3(0.0f,0.0f,1.0f),     glm::vec2(1.0f,0.0f),		 glm::vec3(0.0f,0.0f,-1.0f),
-	glm::vec3(0.5f,0.5f,0.0f),       glm::vec3(1.0f,1.0f,1.0f),     glm::vec2(1.0f,1.0f),		 glm::vec3(0.0f,0.0f,-1.0f)
+	glm::vec3(-0.5f,0.5f,0.0f),      glm::vec3(1.0f,0.0f,0.0f),     glm::vec2(0.0f,1.0f),        glm::vec3(0.0f,0.0f,1.0f),
+	glm::vec3(-0.5f,-0.5f,0.0f),     glm::vec3(0.0f,1.0f,0.0f),     glm::vec2(0.0f,0.0f),		 glm::vec3(0.0f,0.0f,1.0f),
+	glm::vec3(0.5f,-0.5f,0.0f),      glm::vec3(0.0f,0.0f,1.0f),     glm::vec2(1.0f,0.0f),		 glm::vec3(0.0f,0.0f,1.0f),
+	glm::vec3(0.5f,0.5f,0.0f),       glm::vec3(1.0f,1.0f,1.0f),     glm::vec2(1.0f,1.0f),		 glm::vec3(0.0f,0.0f,1.0f)
 };
 
 unsigned noofvertices = sizeof(vertices) / sizeof(Vertex);
@@ -131,6 +131,7 @@ int main(void)
 	int frameBufferWidth, frameBufferHeight = 0;
 	//Create window 
 	GLFWwindow* window = glfwCreateWindow(width,Height,"Window Only",NULL,NULL);
+	//GLFWwindow* window_1 = glfwCreateWindow(width, Height, "Window 2 Only", NULL, NULL);
 	glfwGetFramebufferSize(window, &frameBufferWidth,&frameBufferHeight);
 	if (!window) {
 
@@ -198,6 +199,13 @@ int main(void)
 	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
 	glBindVertexArray(0);
 
+
+	//*********************** MESH MESH MESH *****************//
+
+	Mesh test(vertices,noofvertices,indeces,noofindeces);
+
+
+
 	// Texture Iinitialization
 	//int image_width = 0;
 	//int image_height = 0;
@@ -231,8 +239,13 @@ int main(void)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	//SOIL_free_image_data(image);
 
-	Texture texture_0("Images/Tcd.png", GL_TEXTURE_2D,0);
+	Texture texture_0("Images/wood.jpg", GL_TEXTURE_2D,0);
 	Texture texture_1("Images/Tomato.png", GL_TEXTURE_2D,1);
+
+
+	// Materials
+	Material material0(glm::vec3(0.1f), glm::vec3(1.1f), glm::vec3(30.1f), texture_0.getTxtureunit(), texture_1.getTxtureunit());
+
 	//Texture 2 
 	//// Texture Iinitialization
 	//int image_width1 = 0;
@@ -316,35 +329,28 @@ int main(void)
 	ourShader.setVec3f(CameraPosition, "CameraPosition");
 
 	//main loop and drawing 
-
+	//glfwRequestWindowAttention(window_1);
+	//*************************************************************
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
 		processInput(window);
 		UpdateInput(window, position, rotation, scale);
+		//glfwRequestWindowAttention(window_1);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.f); //rgb a-opaque
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		
 		
-		ourShader.set1i(0, "texture0");
-		ourShader.set1i(1, "texture1");
+		ourShader.set1i(texture_0.getTxtureunit(), "texture0");
+		ourShader.set1i(texture_1.getTxtureunit(), "texture1");
+		material0.senToShader(ourShader);
 
 		//ourShader.use();
-		// Initialize model matrix here also 
-		//position.z -= 0.01f;
-		//rotation.y += 1.0f;
-		//ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f,0.0f,-1.0f));
-		//ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//ModelMatrix = glm::rotate(ModelMatrix, glm::radians(5.f), glm::vec3(0.0f, 1.f, 0.0f));
-		//ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.0f, 0.f, 1.0f));
-		//ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f)); //- old code
-
-
-
+		// Initialize model matrix here also
 		// chnaging cat movements 
 		// DOnt forget to add + and - sign else we will get a still image only 
-		position.z -= 0.01f;
-		rotation.x += 1.0f;
+		//position.z -= 0.01f;
+		//rotation.x += 1.0f;
 		/*glm::mat4 trans = glm::mat4(1.0f);
 		glm::mat4 rotate = glm::mat4(0.0f);
 		glm::mat4 scaleM = glm::mat4(0.0f);*/
@@ -380,6 +386,8 @@ int main(void)
 		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, noofindeces, GL_UNSIGNED_INT, 0);
+
+		test.render(&ourShader);
 		glfwSwapBuffers(window);
 		
 
