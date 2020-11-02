@@ -88,13 +88,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Project_Tcd;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\src\SOIL2;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\include;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glm-0.9.9.7\glm;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\AntTweakBar\include;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Project_Tcd;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\src\SOIL2;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\include;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glm-0.9.9.7\glm;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\lib\windows;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\lib-vc2017;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glew32.lib;soil2.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\AntTweakBar\lib;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\lib\windows;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\lib-vc2017;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AntTweakBar.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glew32.lib;soil2.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -124,13 +124,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Project_Tcd;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\src\SOIL2;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\include;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glm-0.9.9.7\glm;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\AntTweakBar\include;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Project_Tcd;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\src\SOIL2;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\include;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glm-0.9.9.7\glm;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\lib\windows;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\lib-vc2017;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glew32.lib;soil2.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\AntTweakBar\lib;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\SOIL2-master\lib\windows;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\openGL\Dependencies\GLFW\lib-vc2017;C:\Users\Darshan\Desktop\Computer Graphics\OpenGL_Series\Project_Tcd\Linking\glew-2.1.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AntTweakBar.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glew32.lib;soil2.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -159,8 +159,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
